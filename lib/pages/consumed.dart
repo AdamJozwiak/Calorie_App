@@ -5,6 +5,12 @@ class Consumed extends StatefulWidget {
   _ConsumedState createState() => _ConsumedState();
 }
 
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
+  }
+}
+
 Widget fillList(List<Map> data){
   List<Widget> list = new List<Widget>();
   data.forEach((element) {
@@ -14,7 +20,9 @@ Widget fillList(List<Map> data){
         children: [
           Image.network(element['image'], scale: 3.0),
           SizedBox(width: 8,),
-          Text(element['name']),
+          Text(element['amount'].toString() + 'x'),
+          SizedBox(width: 8,),
+          Text(element['name'].toString().capitalize()),
           SizedBox(width: 8,),
           Text((element['kcal'] * element['amount']).toString()),
           SizedBox(width: 8,),
