@@ -35,7 +35,6 @@ Widget fillList(List<Map> data){
 }
 
 class _ConsumedState extends State<Consumed> {
-
   List<Map> data = List();
 
   @override

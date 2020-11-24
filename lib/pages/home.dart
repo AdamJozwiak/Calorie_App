@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:call_app/widgets/calendar.dart';
+import 'package:call_app/services/speech_recognition.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -10,13 +11,11 @@ class _HomeState extends State<Home> {
   String foodName;
   Map foodData = {};
   List<Map> foodConsumed = List();
-  CalendarController _calendarController;
 
   @override
   void initState() {
     foodData = null;
     super.initState();
-    _calendarController = CalendarController();
   }
 
   @override
@@ -47,51 +46,12 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Positioned(
-                      top: 60.0,
-                      child: Row(
-                        children: [
-                          IconButton(
-                              icon: Icon(
-                                Icons.arrow_back_ios_rounded,
-                                color: Colors.grey[850],
-                                size: 30.0,
-                              ), onPressed: () {}),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                Text('Monday',
-                                style: TextStyle(
-                                  color: Colors.grey[850],
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.5
-                                ),),
-                                Text('06 Nov 2020',
-                                  style: TextStyle(
-                                      color: Colors.grey[850],
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.normal,
-                                      letterSpacing: 0.5
-                                  ),),
-                              ],
-                            ),
-                          ),
-                          Transform.rotate(
-                            angle: 135.0,
-                            child: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_back_ios_rounded,
-                                  color: Colors.grey[850],
-                                  size: 30.0,
-                                ), onPressed: () {}),
-                          ),
-                        ],
-                      ),
-                    ),
+                    Calendar(),
                     SizedBox(height: 50.0),
-                    Container(
-                      child: Text(''),
+                    Center(
+                      child: Container(
+                        child: Text('Calories consumed : ' + countCalories().toString()),
+                      ),
                     ),
                     SizedBox(height: 20.0),
                     Container(
@@ -142,6 +102,7 @@ class _HomeState extends State<Home> {
                       icon: Icon(Icons.fastfood),
                       label: Text('Check your food'),
                     ),
+                    SpeechRec(),
                   ],
                 ),
               ),
@@ -149,14 +110,14 @@ class _HomeState extends State<Home> {
           ]
           ),
         ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      );
+  }
 
-
-        },
-        child: Icon(Icons.mic),
-        backgroundColor: Colors.green[700],
-      ),
-    );
+  double countCalories() {
+    double calories = 0.0;
+    foodConsumed.forEach((element) {
+      calories += element['kcal'] * element['amount'];
+    });
+    return calories;
   }
 }

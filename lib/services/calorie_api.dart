@@ -12,7 +12,6 @@ class Api extends StatefulWidget {
 class _ApiState extends State<Api> {
   String APP_ID = '82b65b31';
   String APP_KEY = 'a3f88b680a73f38bc741e86157d7c378';
-
   String foodName = '';
 
   void getFoodInfo() async
