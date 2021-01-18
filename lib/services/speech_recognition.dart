@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:call_app/shared/showAlert.dart';
+import 'package:call_app/shared/functions.dart';
 
 class SpeechRec extends StatefulWidget {
   final getFoodname;
