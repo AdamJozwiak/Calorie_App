@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "135958550717",
+    "project_id": "callorie-app",
+    "storage_bucket": "callorie-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135958550717:android:81a8ac1c62cac3c0ff7fd4",
+        "android_client_info": {
+          "package_name": "com.adamjozwiak.call_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "135958550717-e210s7bhv6dc9bj9oqs14975dd2mine5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAi2KgAXe2mJum772XEGfyIQQZFIcrgyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "135958550717-e210s7bhv6dc9bj9oqs14975dd2mine5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
