@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:call_app/models/food.dart';
-import 'package:call_app/shared/loading.dart';
+import 'package:call_app/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -10,13 +10,13 @@ class Api extends StatefulWidget {
 }
 
 class _ApiState extends State<Api> {
-  String APP_ID = '82b65b31';
-  String APP_KEY = 'a3f88b680a73f38bc741e86157d7c378';
+  String _APP_ID = '82b65b31';
+  String _APP_KEY = 'a3f88b680a73f38bc741e86157d7c378';
   String foodName = '';
 
   void getFoodInfo() async {
     Response response = await get(
-        'https://api.edamam.com/api/food-database/v2/parser?ingr=${foodName}&app_id=${APP_ID}&app_key=${APP_KEY}');
+        'https://api.edamam.com/api/food-database/v2/parser?ingr=${foodName}&app_id=${_APP_ID}&app_key=${_APP_KEY}');
     Map data = jsonDecode(response.body);
 
     Food extractedData = Food(
