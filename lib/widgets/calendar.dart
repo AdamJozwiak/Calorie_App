@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Calendar extends StatefulWidget {
+  final getChosenDate;
+  Calendar({Key key, this.getChosenDate}) : super(key: key);
   @override
   _CalendarState createState() => _CalendarState();
 }
@@ -24,19 +26,17 @@ class _CalendarState extends State<Calendar> {
         initialCalendarFormat: CalendarFormat.week,
         startingDayOfWeek: StartingDayOfWeek.monday,
         calendarStyle: CalendarStyle(
-            todayColor: Colors.green[700],
-            selectedColor: Colors.orange[200],
+          todayColor: Colors.green[700],
+          selectedColor: Colors.orange[200],
         ),
         headerStyle: HeaderStyle(
             centerHeaderTitle: true,
             formatButtonShowsNext: false,
             formatButtonDecoration: BoxDecoration(
                 color: Colors.green[700],
-                borderRadius: BorderRadius.circular(10)
-            )
-        ),
+                borderRadius: BorderRadius.circular(10))),
         onDaySelected: (date, events, holidays) {
-
+          widget.getChosenDate(date);
         },
         calendarController: _calendarController);
   }
