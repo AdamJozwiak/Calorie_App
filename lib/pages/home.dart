@@ -3,6 +3,7 @@ import 'package:call_app/models/user.dart';
 import 'package:call_app/services/auth.dart';
 import 'package:call_app/services/database.dart';
 import 'package:call_app/shared/functions.dart';
+import 'package:call_app/widgets/caloriesSummary.dart';
 import 'package:flutter/material.dart';
 import 'package:call_app/widgets/calendar.dart';
 import 'package:call_app/services/speech_recognition.dart';
@@ -14,25 +15,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String foodName;
-  Food foodData = Food();
-  List<Food> foodConsumed = List();
+  String _foodName;
+  Food _foodData = Food();
+  List<Food> _foodConsumed = List();
+  List<Food> _displayedFood = List();
   User currentUser = User();
-  String caloriesConsumed;
+  String _caloriesConsumed;
+  String _caloriesDisplayed;
+  bool _isDifferentDayDisplayed = false;
 
   final AuthService _auth = AuthService();
 
   @override
   void initState() {
-    foodData = null;
+    _foodData = null;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     currentUser = Provider.of<User>(context);
-    foodConsumed = Provider.of<List<Food>>(context) ?? [];
-    caloriesConsumed = countCalories(foodConsumed).toString() ?? '0.0';
+    _foodConsumed = Provider.of<List<Food>>(context) ?? [];
+    _caloriesConsumed = countCalories(_foodConsumed).toString() ?? '0.0';
 
     return Scaffold(
       appBar: AppBar(
@@ -67,10 +71,10 @@ class _HomeState extends State<Home> {
               children: [
                 Calendar(getChosenDate: getSelectedDate),
                 SizedBox(height: 50.0),
-                Center(
-                  child: Container(
-                    child: Text('Calories consumed : ' + caloriesConsumed),
-                  ),
+                CaloriesSummary(
+                  differentDate: _isDifferentDayDisplayed,
+                  calories: _caloriesConsumed,
+                  differentDateCalories: _caloriesDisplayed,
                 ),
                 SizedBox(height: 20.0),
                 Container(),
@@ -81,8 +85,8 @@ class _HomeState extends State<Home> {
                   decoration: InputDecoration(
                     labelText: 'Input food name',
                   ),
-                  onChanged: (String foodName) {
-                    this.foodName = foodName;
+                  onChanged: (String _foodName) {
+                    this._foodName = _foodName;
                   },
                 ),
                 SizedBox(height: 20.0),
@@ -96,8 +100,13 @@ class _HomeState extends State<Home> {
                 SizedBox(height: 20.0),
                 FlatButton.icon(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/consumed',
-                        arguments: foodConsumed);
+                    if (!_isDifferentDayDisplayed) {
+                      Navigator.pushNamed(context, '/consumed',
+                          arguments: _foodConsumed);
+                    } else {
+                      Navigator.pushNamed(context, '/consumed',
+                          arguments: _displayedFood);
+                    }
                   },
                   icon: Icon(Icons.fastfood),
                   label: Text('Check your food'),
@@ -112,38 +121,36 @@ class _HomeState extends State<Home> {
   }
 
   void getSelectedDate(DateTime date) async {
-    DatabaseService database = DatabaseService(uid: currentUser.uid);
-    List<Food> temp = await database.getUserData(getDate(date));
-    print('Przed-> Kalorie: ' + caloriesConsumed + ' ');
-    foodConsumed.forEach((element) {
-      print(element.name + ' ');
-    });
-    setState(() {
-      foodConsumed = temp;
-      caloriesConsumed = countCalories(foodConsumed).toString();
-    });
-    print('Po-> Kalorie: ' + caloriesConsumed + ' ');
-    foodConsumed.forEach((element) {
-      print(element.name + ' ');
-    });
+    if (getDate(date) != getCurrentDate()) {
+      DatabaseService database = DatabaseService(uid: currentUser.uid);
+      _displayedFood = await database.getUserData(getDate(date));
+      setState(() {
+        _isDifferentDayDisplayed = true;
+        _caloriesDisplayed = countCalories(_displayedFood).toString();
+      });
+    } else {
+      setState(() {
+        _isDifferentDayDisplayed = false;
+      });
+    }
   }
 
   void getSpokenFood(String spokenName) {
     setState(() {
-      foodName = spokenName;
+      _foodName = spokenName;
     });
     apiFoodInfo();
   }
 
   void apiFoodInfo() async {
-    print(foodName);
-    if (foodName != null && foodName != '') {
+    print(_foodName);
+    if (_foodName != null && _foodName != '') {
       try {
         //TODO: zabezpieczyc przed dziwnymi slowami
         final data = await Navigator.pushNamed(context, '/loading',
-            arguments: this.foodName);
+            arguments: this._foodName);
         setState(() {
-          foodData = data;
+          _foodData = data;
         });
         updateFoodList();
       } catch (e) {
@@ -157,10 +164,10 @@ class _HomeState extends State<Home> {
   }
 
   void updateFoodList() async {
-    if (foodData != null) {
+    if (_foodData != null) {
       bool isFound = false;
-      for (final i in foodConsumed) {
-        if (i.name == foodData.name) {
+      for (final i in _foodConsumed) {
+        if (i.name == _foodData.name) {
           i.amount += 1;
           isFound = true;
           await DatabaseService(uid: currentUser.uid).updateUserData(i);
@@ -168,11 +175,11 @@ class _HomeState extends State<Home> {
         }
       }
       if (!isFound) {
-        foodConsumed.add(foodData);
-        await DatabaseService(uid: currentUser.uid).updateUserData(foodData);
+        _foodConsumed.add(_foodData);
+        await DatabaseService(uid: currentUser.uid).updateUserData(_foodData);
       }
       setState(() {
-        caloriesConsumed = countCalories(foodConsumed).toString();
+        _caloriesConsumed = countCalories(_foodConsumed).toString();
       });
     }
   }
