@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 String getCurrentDate() {
   var date = new DateTime.now().toString();
   var parsedDate = DateTime.parse(date);
-  var formattedDate = '${parsedDate.day}${parsedDate.month}${parsedDate.year}';
+  return '${parsedDate.day}${parsedDate.month}${parsedDate.year}';
+}
 
-  return formattedDate;
+String getDate(DateTime date) {
+  var parsedDate = DateTime.parse(date.toString());
+  return '${parsedDate.day}${parsedDate.month}${parsedDate.year}';
 }
 
 double countCalories(List<Food> foodConsumed) {
