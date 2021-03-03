@@ -4,7 +4,7 @@ import 'package:call_app/pages/loggingWrapper.dart';
 import 'package:call_app/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:call_app/pages/home.dart';
-import 'package:call_app/services/calorie_api.dart';
+import 'package:call_app/services/api.dart';
 import 'package:provider/provider.dart';
 
 void main() {

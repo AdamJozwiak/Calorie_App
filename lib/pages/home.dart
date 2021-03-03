@@ -145,17 +145,16 @@ class _HomeState extends State<Home> {
   void apiFoodInfo() async {
     print(_foodName);
     if (_foodName != null && _foodName != '') {
-      try {
-        //TODO: zabezpieczyc przed dziwnymi slowami
-        final data = await Navigator.pushNamed(context, '/loading',
-            arguments: this._foodName);
+      final data = await Navigator.pushNamed(context, '/loading',
+          arguments: this._foodName);
+      if (data != null) {
         setState(() {
           _foodData = data;
         });
         updateFoodList();
-      } catch (e) {
-        print(e.toString());
-        return null;
+      } else {
+        showAlert(context, 'Wrong food name',
+            'I am sorry, but I did not understand. Could you reapeat?');
       }
     } else {
       showAlert(context, 'Wrong food name',
