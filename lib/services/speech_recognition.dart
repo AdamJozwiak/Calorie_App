@@ -55,50 +55,45 @@ class _SpeechRecState extends State<SpeechRec> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        children: [
-          Text(_text),
-          Container(
-            child: AvatarGlow(
-              animate: _isListening,
-              glowColor: Colors.green,
-              endRadius: 75.0,
-              duration: const Duration(milliseconds: 2000),
-              repeatPauseDuration: const Duration(milliseconds: 100),
-              repeat: true,
-              child: Listener(
-                onPointerDown: (_) {
-                  if (!_isListening) {
-                    listen();
-                  } else {
-                    showAlert(
-                        context, 'Error', 'An error occured. Please try again');
-                  }
-                },
-                onPointerUp: (_) {
-                  if (_isListening) {
-                    stopListening();
-                  } else {
-                    showAlert(context, 'Cannot find result',
-                        'Please, try holding the button a little longer');
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green[700],
-                    borderRadius: BorderRadius.circular(40.0),
-                  ),
-                  padding: EdgeInsets.all(15.0),
-                  child: Icon(
-                    Icons.mic,
-                    size: 30,
-                    color: Colors.white,
-                  ),
-                ),
+      child: Container(
+        child: AvatarGlow(
+          animate: _isListening,
+          glowColor: Colors.green,
+          endRadius: 65.0,
+          duration: const Duration(milliseconds: 2000),
+          repeatPauseDuration: const Duration(milliseconds: 100),
+          repeat: true,
+          child: Listener(
+            onPointerDown: (_) {
+              if (!_isListening) {
+                listen();
+              } else {
+                showAlert(
+                    context, 'Error', 'An error occured. Please try again');
+              }
+            },
+            onPointerUp: (_) {
+              if (_isListening) {
+                stopListening();
+              } else {
+                showAlert(context, 'Cannot find result',
+                    'Please, try holding the button a little longer');
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.green[700],
+                borderRadius: BorderRadius.circular(40.0),
+              ),
+              padding: EdgeInsets.all(10.0),
+              child: Icon(
+                Icons.mic,
+                size: 30,
+                color: Colors.white,
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

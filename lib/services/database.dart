@@ -29,6 +29,26 @@ class DatabaseService {
     }
   }
 
+  Future<List<Food>> getUserData(String date) async {
+    List<Food> foods = new List();
+    return await foodCollection
+        .document(uid)
+        .collection(date)
+        .getDocuments()
+        .then((value) {
+      value.documents.forEach((doc) {
+        foods.add(Food(
+          name: doc.data['name'] ?? '',
+          kcal: doc.data['kcal'] ?? 0,
+          fat: doc.data['fat'] ?? 0,
+          imageUrl: doc.data['image'] ?? null,
+          amount: doc.data['amount'] ?? 0,
+        ));
+      });
+      return foods;
+    });
+  }
+
   // get food stream
   Stream<List<Food>> get foods {
     return foodCollection
@@ -48,25 +68,5 @@ class DatabaseService {
         amount: doc.data['amount'] ?? 0,
       );
     }).toList();
-  }
-
-  Future<List<Food>> getUserData(String date) async {
-    List<Food> foods = new List();
-    return await foodCollection
-        .document(uid)
-        .collection(date)
-        .getDocuments()
-        .then((value) {
-      value.documents.forEach((doc) {
-        foods.add(Food(
-          name: doc.data['name'] ?? '',
-          kcal: doc.data['kcal'] ?? 0,
-          fat: doc.data['fat'] ?? 0,
-          imageUrl: doc.data['image'] ?? null,
-          amount: doc.data['amount'] ?? 0,
-        ));
-      });
-      return foods;
-    });
   }
 }

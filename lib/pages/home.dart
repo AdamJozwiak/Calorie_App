@@ -3,7 +3,7 @@ import 'package:call_app/models/user.dart';
 import 'package:call_app/services/auth.dart';
 import 'package:call_app/services/database.dart';
 import 'package:call_app/shared/functions.dart';
-import 'package:call_app/widgets/caloriesSummary.dart';
+import 'package:call_app/widgets/radial_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:call_app/widgets/calendar.dart';
 import 'package:call_app/services/speech_recognition.dart';
@@ -20,8 +20,9 @@ class _HomeState extends State<Home> {
   List<Food> _foodConsumed = List();
   List<Food> _displayedFood = List();
   User currentUser = User();
-  String _caloriesConsumed;
-  String _caloriesDisplayed;
+  double _caloriesConsumed;
+  double recommendedDailyCalorie = 2000.0;
+  double _caloriesDisplayed;
   bool _isDifferentDayDisplayed = false;
 
   final AuthService _auth = AuthService();
@@ -36,7 +37,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     currentUser = Provider.of<User>(context);
     _foodConsumed = Provider.of<List<Food>>(context) ?? [];
-    _caloriesConsumed = countCalories(_foodConsumed).toString() ?? '0.0';
+    _caloriesConsumed = countCalories(_foodConsumed) ?? 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -44,20 +45,36 @@ class _HomeState extends State<Home> {
         elevation: 10.0,
         shadowColor: Colors.grey[600],
         title: Text(
-          'Call App',
+          'CalApp',
           style: TextStyle(
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 3.0,
-          ),
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 3.0,
+              color: Colors.black87),
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 55.0),
+            child: FlatButton.icon(
+              onPressed: () {
+                if (!_isDifferentDayDisplayed) {
+                  Navigator.pushNamed(context, '/consumed',
+                      arguments: _foodConsumed);
+                } else {
+                  Navigator.pushNamed(context, '/consumed',
+                      arguments: _displayedFood);
+                }
+              },
+              icon: Icon(Icons.fastfood),
+              label: Text('Food'),
+            ),
+          ),
           FlatButton.icon(
               onPressed: () async {
                 await _auth.signOut();
               },
               icon: Icon(Icons.person),
-              label: Text('logout'))
+              label: Text('Logout'))
         ],
       ),
       backgroundColor: Colors.grey[350],
@@ -70,17 +87,26 @@ class _HomeState extends State<Home> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Calendar(getChosenDate: getSelectedDate),
-                SizedBox(height: 50.0),
-                CaloriesSummary(
+                Divider(
+                  height: 10.0,
+                  thickness: 1.0,
+                ),
+                SizedBox(
+                  height: 15.0,
+                ),
+                Text(
+                  'Calories Consumed',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 25.0),
+                RadialProgress(
                   differentDate: _isDifferentDayDisplayed,
                   calories: _caloriesConsumed,
-                  differentDateCalories: _caloriesDisplayed,
+                  differentCalories: _caloriesDisplayed,
+                  recommendedCalories: recommendedDailyCalorie,
                 ),
-                SizedBox(height: 20.0),
-                Container(),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 5.0),
                 TextField(
                   decoration: InputDecoration(
                     labelText: 'Input food name',
@@ -88,28 +114,22 @@ class _HomeState extends State<Home> {
                   onChanged: (String _foodName) {
                     this._foodName = _foodName;
                   },
+                  onSubmitted: (String _foodName) async {
+                    this._foodName = _foodName;
+                    if (_foodName != '' && _foodName != null) {
+                      apiFoodInfo();
+                    }
+                  },
                 ),
-                SizedBox(height: 20.0),
+                SizedBox(
+                  height: 10.0,
+                ),
                 FlatButton.icon(
                   onPressed: () async {
                     apiFoodInfo();
                   },
-                  icon: Icon(Icons.fastfood),
-                  label: Text('Search food info'),
-                ),
-                SizedBox(height: 20.0),
-                FlatButton.icon(
-                  onPressed: () {
-                    if (!_isDifferentDayDisplayed) {
-                      Navigator.pushNamed(context, '/consumed',
-                          arguments: _foodConsumed);
-                    } else {
-                      Navigator.pushNamed(context, '/consumed',
-                          arguments: _displayedFood);
-                    }
-                  },
-                  icon: Icon(Icons.fastfood),
-                  label: Text('Check your food'),
+                  icon: Icon(Icons.search),
+                  label: Text('Search'),
                 ),
                 SpeechRec(getFoodname: getSpokenFood),
               ],
@@ -126,7 +146,7 @@ class _HomeState extends State<Home> {
       _displayedFood = await database.getUserData(getDate(date));
       setState(() {
         _isDifferentDayDisplayed = true;
-        _caloriesDisplayed = countCalories(_displayedFood).toString();
+        _caloriesDisplayed = countCalories(_displayedFood);
       });
     } else {
       setState(() {
@@ -178,7 +198,7 @@ class _HomeState extends State<Home> {
         await DatabaseService(uid: currentUser.uid).updateUserData(_foodData);
       }
       setState(() {
-        _caloriesConsumed = countCalories(_foodConsumed).toString();
+        _caloriesConsumed = countCalories(_foodConsumed);
       });
     }
   }

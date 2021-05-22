@@ -20,7 +20,8 @@ class CalorieApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             primarySwatch: Colors.green,
-            visualDensity: VisualDensity.adaptivePlatformDensity),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            fontFamily: 'Farro'),
         routes: {
           '/': (context) => Wrapper(),
           '/home': (context) => Home(),
