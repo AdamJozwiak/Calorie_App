@@ -46,51 +46,43 @@ class ItemList extends StatefulWidget {
 class _ItemListState extends State<ItemList> {
   bool stateChanged = false;
   bool inititalBuild = true;
+  List<Widget> list;
+  List<Food> _modifiedData;
   @override
   Widget build(BuildContext context) {
-    List<Widget> list = new List<Widget>();
-    List<Food> _modifiedData = new List<Food>();
     if (inititalBuild) {
+      list = new List<Widget>();
+      _modifiedData = new List<Food>();
       widget.foodData.forEach((element) {
         _modifiedData.add(element);
       });
-      setState(() {
-        inititalBuild = false;
-      });
+      inititalBuild = false;
     }
+    if (stateChanged) {
+      list.clear();
+      stateChanged = false;
+    }
+
     _modifiedData.forEach((element) {
       list.add(Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             imageCheck(element),
-            SizedBox(
-              width: 8,
-            ),
             Text(element.amount.toString() + 'x'),
-            SizedBox(
-              width: 8,
-            ),
             Text(element.name.toString().capitalize()),
-            SizedBox(
-              width: 8,
-            ),
             Text((element.kcal * element.amount).toString()),
-            SizedBox(
-              width: 8,
-            ),
             Text((element.fat * element.amount).toString()),
-            SizedBox(
-              width: 50,
-            ),
             FlatButton.icon(
               onPressed: () {
-                list.remove(element);
                 _modifiedData.remove(element);
-                setState(() {
-                  stateChanged = !stateChanged;
+                modifyRecords(widget.user.uid, _modifiedData, widget.foodData)
+                    .then((value) {
+                  setState(() {
+                    stateChanged = value;
+                  });
                 });
-                modifyRecords(widget.user.uid, _modifiedData, widget.foodData);
               },
               icon: Icon(
                 Icons.delete_forever,
@@ -102,6 +94,7 @@ class _ItemListState extends State<ItemList> {
         ),
       ));
     });
+
     return ListView(shrinkWrap: true, children: [Column(children: list)]);
   }
 }
@@ -112,15 +105,17 @@ extension StringExtension on String {
   }
 }
 
-void modifyRecords(
+Future<bool> modifyRecords(
     String uid, List<Food> foodData, List<Food> originalFoodData) async {
   if (foodData != null && originalFoodData != null) {
     for (final i in originalFoodData) {
       if (!foodData.contains(i)) {
         await DatabaseService(uid: uid).deleteUserData(i);
+        return true;
       }
     }
   }
+  return false;
 }
 
 Widget imageCheck(Food data) {
