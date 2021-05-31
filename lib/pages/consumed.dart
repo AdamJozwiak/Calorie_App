@@ -1,9 +1,109 @@
 import 'package:call_app/models/food.dart';
+import 'package:call_app/models/user.dart';
+import 'package:call_app/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Consumed extends StatefulWidget {
   @override
   _ConsumedState createState() => _ConsumedState();
+}
+
+class _ConsumedState extends State<Consumed> {
+  List<Food> data = List();
+  @override
+  Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
+    data = ModalRoute.of(context).settings.arguments;
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.green[700],
+          elevation: 10.0,
+          shadowColor: Colors.grey[600],
+          title: Text(
+            'Food Consumed',
+            style: TextStyle(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 3.0,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        backgroundColor: Colors.grey[350],
+        body: ItemList(foodData: data, user: user));
+  }
+}
+
+class ItemList extends StatefulWidget {
+  final List<Food> foodData;
+  final User user;
+  ItemList({Key key, this.foodData, this.user}) : super(key: key);
+  @override
+  _ItemListState createState() => _ItemListState();
+}
+
+class _ItemListState extends State<ItemList> {
+  bool stateChanged = false;
+  bool inititalBuild = true;
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> list = new List<Widget>();
+    List<Food> _modifiedData = new List<Food>();
+    if (inititalBuild) {
+      widget.foodData.forEach((element) {
+        _modifiedData.add(element);
+      });
+      setState(() {
+        inititalBuild = false;
+      });
+    }
+    _modifiedData.forEach((element) {
+      list.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            imageCheck(element),
+            SizedBox(
+              width: 8,
+            ),
+            Text(element.amount.toString() + 'x'),
+            SizedBox(
+              width: 8,
+            ),
+            Text(element.name.toString().capitalize()),
+            SizedBox(
+              width: 8,
+            ),
+            Text((element.kcal * element.amount).toString()),
+            SizedBox(
+              width: 8,
+            ),
+            Text((element.fat * element.amount).toString()),
+            SizedBox(
+              width: 50,
+            ),
+            FlatButton.icon(
+              onPressed: () {
+                list.remove(element);
+                _modifiedData.remove(element);
+                setState(() {
+                  stateChanged = !stateChanged;
+                });
+                modifyRecords(widget.user.uid, _modifiedData, widget.foodData);
+              },
+              icon: Icon(
+                Icons.delete_forever,
+                color: Colors.red[300],
+              ),
+              label: Text(''),
+            )
+          ],
+        ),
+      ));
+    });
+    return ListView(shrinkWrap: true, children: [Column(children: list)]);
+  }
 }
 
 extension StringExtension on String {
@@ -12,35 +112,15 @@ extension StringExtension on String {
   }
 }
 
-Widget fillList(List<Food> data) {
-  List<Widget> list = new List<Widget>();
-  data.forEach((element) {
-    list.add(Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          imageCheck(element),
-          SizedBox(
-            width: 8,
-          ),
-          Text(element.amount.toString() + 'x'),
-          SizedBox(
-            width: 8,
-          ),
-          Text(element.name.toString().capitalize()),
-          SizedBox(
-            width: 8,
-          ),
-          Text((element.kcal * element.amount).toString()),
-          SizedBox(
-            width: 8,
-          ),
-          Text((element.fat * element.amount).toString()),
-        ],
-      ),
-    ));
-  });
-  return new Column(children: list);
+void modifyRecords(
+    String uid, List<Food> foodData, List<Food> originalFoodData) async {
+  if (foodData != null && originalFoodData != null) {
+    for (final i in originalFoodData) {
+      if (!foodData.contains(i)) {
+        await DatabaseService(uid: uid).deleteUserData(i);
+      }
+    }
+  }
 }
 
 Widget imageCheck(Food data) {
@@ -62,38 +142,6 @@ Widget imageCheck(Food data) {
           image: DecorationImage(
               fit: BoxFit.fill,
               image: AssetImage('assets/unavailableImage.png'))),
-    );
-  }
-}
-
-class _ConsumedState extends State<Consumed> {
-  List<Food> data = List();
-
-  @override
-  Widget build(BuildContext context) {
-    data = ModalRoute.of(context).settings.arguments;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green[700],
-        elevation: 10.0,
-        shadowColor: Colors.grey[600],
-        title: Text(
-          'Food Consumed',
-          style: TextStyle(
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 3.0,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      backgroundColor: Colors.grey[350],
-      body: ListView(
-        shrinkWrap: true,
-        children: [
-          fillList(data),
-        ],
-      ),
     );
   }
 }

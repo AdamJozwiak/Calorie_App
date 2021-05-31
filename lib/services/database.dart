@@ -29,6 +29,18 @@ class DatabaseService {
     }
   }
 
+  Future deleteUserData(Food food) async {
+    if (food != null) {
+      return await foodCollection
+          .document(uid)
+          .collection(selectedDate)
+          .document(food.name)
+          .delete();
+    } else {
+      throw Exception('No food data transfered to database');
+    }
+  }
+
   Future<List<Food>> getUserData(String date) async {
     List<Food> foods = new List();
     return await foodCollection
