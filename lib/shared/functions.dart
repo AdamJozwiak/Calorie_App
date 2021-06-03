@@ -21,11 +21,28 @@ double countCalories(List<Food> foodConsumed) {
   return calories;
 }
 
+double countFats(List<Food> foodConsumed) {
+  double fats = 0.0;
+  foodConsumed.forEach((element) {
+    fats += element.fat * element.amount;
+  });
+  return fats;
+}
+
+double countProteins(List<Food> foodConsumed) {
+  double proteins = 0.0;
+  foodConsumed.forEach((element) {
+    proteins += element.protein * element.amount;
+  });
+  return proteins;
+}
+
 Future<void> showAlert(
     BuildContext context, String title, String contents) async {
   return showDialog(
       context: context,
       barrierDismissible: false,
+      useSafeArea: true,
       builder: (BuildContext context) {
         return Alert(title, contents);
       });
