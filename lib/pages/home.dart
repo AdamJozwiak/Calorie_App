@@ -4,6 +4,7 @@ import 'package:call_app/services/auth.dart';
 import 'package:call_app/services/database.dart';
 import 'package:call_app/shared/functions.dart';
 import 'package:call_app/widgets/radial_progress.dart';
+import 'package:call_app/widgets/text_search.dart';
 import 'package:flutter/material.dart';
 import 'package:call_app/widgets/calendar.dart';
 import 'package:call_app/services/speech_recognition.dart';
@@ -15,14 +16,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String _foodName;
   Food _foodData = Food();
+  User currentUser = User();
   List<Food> _foodConsumed = List();
   List<Food> _displayedFood = List();
-  User currentUser = User();
-  double _caloriesConsumed;
-  double recommendedDailyCalorie = 2000.0;
-  double _caloriesDisplayed;
+
+  // Time 2, because there are different values for current and different days
+  List<double> _caloriesConsumed = List<double>(2);
+  List<double> _fatsConsumed = List<double>(2);
+  List<double> _proteinsConsumed = List<double>(2);
+  List<double> recommendedDailyIntake = List<double>(3);
+
+  String _foodName;
   bool _isDifferentDayDisplayed = false;
 
   final AuthService _auth = AuthService();
@@ -30,6 +35,9 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _foodData = null;
+    recommendedDailyIntake[0] = 2500.0;
+    recommendedDailyIntake[1] = 50.0;
+    recommendedDailyIntake[2] = 55.0;
     super.initState();
   }
 
@@ -37,106 +45,93 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     currentUser = Provider.of<User>(context);
     _foodConsumed = Provider.of<List<Food>>(context) ?? [];
-    _caloriesConsumed = countCalories(_foodConsumed) ?? 0.0;
+    _caloriesConsumed[0] = countCalories(_foodConsumed) ?? 0.0;
+    _fatsConsumed[0] = countFats(_foodConsumed) ?? 0.0;
+    _proteinsConsumed[0] = countProteins(_foodConsumed) ?? 0.0;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green[700],
-        elevation: 10.0,
-        shadowColor: Colors.grey[600],
-        title: Text(
-          'CalApp',
-          style: TextStyle(
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 3.0,
-              color: Colors.black87),
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.green[700],
+          elevation: 10.0,
+          shadowColor: Colors.grey[600],
+          title: Text(
+            'CalApp',
+            style: TextStyle(
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 3.0,
+                color: Colors.black87),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 55.0),
+              child: FlatButton.icon(
+                onPressed: () {
+                  if (!_isDifferentDayDisplayed) {
+                    Navigator.pushNamed(context, '/consumed',
+                        arguments: _foodConsumed);
+                  } else {
+                    Navigator.pushNamed(context, '/consumed',
+                        arguments: _displayedFood);
+                  }
+                },
+                icon: Icon(Icons.fastfood),
+                label: Text('Food'),
+              ),
+            ),
+            FlatButton.icon(
+                onPressed: () async {
+                  await _auth.signOut();
+                },
+                icon: Icon(Icons.person),
+                label: Text('Logout'))
+          ],
         ),
-        actions: [
+        backgroundColor: Colors.grey[350],
+        body: ListView(children: [
           Padding(
-            padding: const EdgeInsets.only(right: 55.0),
-            child: FlatButton.icon(
-              onPressed: () {
-                if (!_isDifferentDayDisplayed) {
-                  Navigator.pushNamed(context, '/consumed',
-                      arguments: _foodConsumed);
-                } else {
-                  Navigator.pushNamed(context, '/consumed',
-                      arguments: _displayedFood);
-                }
-              },
-              icon: Icon(Icons.fastfood),
-              label: Text('Food'),
-            ),
-          ),
-          FlatButton.icon(
-              onPressed: () async {
-                await _auth.signOut();
-              },
-              icon: Icon(Icons.person),
-              label: Text('Logout'))
-        ],
-      ),
-      backgroundColor: Colors.grey[350],
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Calendar(getChosenDate: getSelectedDate),
-                Divider(
-                  height: 10.0,
-                  thickness: 1.0,
-                ),
-                SizedBox(
-                  height: 15.0,
-                ),
-                Text(
-                  'Calories Consumed',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 25.0),
-                RadialProgress(
-                  differentDate: _isDifferentDayDisplayed,
-                  calories: _caloriesConsumed,
-                  differentCalories: _caloriesDisplayed,
-                  recommendedCalories: recommendedDailyCalorie,
-                ),
-                SizedBox(height: 5.0),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Input food name',
+            padding: const EdgeInsets.all(15.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Calendar(getChosenDate: getSelectedDate),
+                  Divider(
+                    height: 10.0,
+                    thickness: 1.0,
                   ),
-                  onChanged: (String _foodName) {
-                    this._foodName = _foodName;
-                  },
-                  onSubmitted: (String _foodName) async {
-                    this._foodName = _foodName;
-                    if (_foodName != '' && _foodName != null) {
-                      apiFoodInfo();
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                FlatButton.icon(
-                  onPressed: () async {
-                    apiFoodInfo();
-                  },
-                  icon: Icon(Icons.search),
-                  label: Text('Search'),
-                ),
-                SpeechRec(getFoodname: getSpokenFood),
-              ],
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text(
+                    'Calories Consumed',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 15.0),
+                  RadialProgress(
+                    differentDate: _isDifferentDayDisplayed,
+                    calories: _caloriesConsumed,
+                    fats: _fatsConsumed,
+                    proteins: _proteinsConsumed,
+                    recommendedCalories: recommendedDailyIntake,
+                  ),
+                  SizedBox(height: 25.0),
+                  TextSearch(callback: (foodName) => textApiInfo(foodName)),
+                  SpeechRec(
+                    getFoodname: getSpokenFood,
+                    buttonSize: 65.0,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
@@ -146,7 +141,9 @@ class _HomeState extends State<Home> {
       _displayedFood = await database.getUserData(getDate(date));
       setState(() {
         _isDifferentDayDisplayed = true;
-        _caloriesDisplayed = countCalories(_displayedFood);
+        _caloriesConsumed[1] = countCalories(_displayedFood);
+        _fatsConsumed[1] = countFats(_foodConsumed);
+        _proteinsConsumed[1] = countCalories(_displayedFood);
       });
     } else {
       setState(() {
@@ -182,6 +179,26 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void textApiInfo(String foodName) async {
+    print(foodName);
+    if (foodName != null && foodName != '') {
+      final data =
+          await Navigator.pushNamed(context, '/loading', arguments: foodName);
+      if (data != null) {
+        setState(() {
+          _foodData = data;
+        });
+        updateFoodList();
+      } else {
+        showAlert(context, 'Wrong food name',
+            'I am sorry, but I did not understand. Could you reapeat?');
+      }
+    } else {
+      showAlert(context, 'Wrong food name',
+          'You have not entered proper food name. Please, try again.');
+    }
+  }
+
   void updateFoodList() async {
     if (_foodData != null) {
       bool isFound = false;
@@ -198,7 +215,9 @@ class _HomeState extends State<Home> {
         await DatabaseService(uid: currentUser.uid).updateUserData(_foodData);
       }
       setState(() {
-        _caloriesConsumed = countCalories(_foodConsumed);
+        _caloriesConsumed[0] = countCalories(_foodConsumed);
+        _fatsConsumed[0] = countFats(_foodConsumed) ?? 0.0;
+        _proteinsConsumed[0] = countProteins(_foodConsumed) ?? 0.0;
       });
     }
   }
