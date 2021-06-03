@@ -5,7 +5,9 @@ import 'package:call_app/shared/functions.dart';
 
 class SpeechRec extends StatefulWidget {
   final getFoodname;
-  SpeechRec({Key key, this.getFoodname}) : super(key: key);
+  final double buttonSize;
+  SpeechRec({Key key, this.getFoodname, @required this.buttonSize})
+      : super(key: key);
 
   @override
   _SpeechRecState createState() => _SpeechRecState();
@@ -59,7 +61,7 @@ class _SpeechRecState extends State<SpeechRec> {
         child: AvatarGlow(
           animate: _isListening,
           glowColor: Colors.green,
-          endRadius: 65.0,
+          endRadius: widget.buttonSize,
           duration: const Duration(milliseconds: 2000),
           repeatPauseDuration: const Duration(milliseconds: 100),
           repeat: true,
