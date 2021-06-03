@@ -1,6 +1,6 @@
 import 'package:call_app/models/user.dart';
 import 'package:call_app/pages/consumed.dart';
-import 'package:call_app/pages/loggingWrapper.dart';
+import 'package:call_app/pages/authenticate/loggingWrapper.dart';
 import 'package:call_app/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:call_app/pages/home.dart';
