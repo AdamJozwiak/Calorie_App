@@ -21,6 +21,7 @@ class DatabaseService {
         'name': food.name ?? '',
         'kcal': food.kcal ?? '0',
         'fat': food.fat ?? '0',
+        'protein': food.protein ?? '0',
         'image': food.imageUrl ?? null,
         'amount': food.amount ?? 0
       });
@@ -53,6 +54,7 @@ class DatabaseService {
           name: doc.data['name'] ?? '',
           kcal: doc.data['kcal'] ?? 0,
           fat: doc.data['fat'] ?? 0,
+          protein: doc.data['protein'] ?? 0,
           imageUrl: doc.data['image'] ?? null,
           amount: doc.data['amount'] ?? 0,
         ));
@@ -76,6 +78,7 @@ class DatabaseService {
         name: doc.data['name'] ?? '',
         kcal: doc.data['kcal'] ?? 0,
         fat: doc.data['fat'] ?? 0,
+        protein: doc.data['protein'] ?? 0,
         imageUrl: doc.data['image'] ?? null,
         amount: doc.data['amount'] ?? 0,
       );

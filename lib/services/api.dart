@@ -31,6 +31,7 @@ class _ApiState extends State<Api> {
           imageUrl: data['parsed'][0]['food']['image'],
           kcal: data['parsed'][0]['food']['nutrients']['ENERC_KCAL'],
           fat: data['parsed'][0]['food']['nutrients']['FAT'],
+          protein: data['parsed'][0]['food']['nutrients']['PROCNT'],
           amount: 1,
         );
       } else {

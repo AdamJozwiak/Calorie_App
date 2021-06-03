@@ -74,6 +74,7 @@ class _ItemListState extends State<ItemList> {
             Text(element.name.toString().capitalize()),
             Text((element.kcal * element.amount).toString()),
             Text((element.fat * element.amount).toString()),
+            Text((element.protein * element.amount).toString()),
             FlatButton.icon(
               onPressed: () {
                 _modifiedData.remove(element);
