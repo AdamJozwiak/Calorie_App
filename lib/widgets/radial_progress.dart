@@ -7,14 +7,14 @@ class RadialProgress extends StatefulWidget {
   final List<double> calories;
   final List<double> fats;
   final List<double> proteins;
-  final List<double> recommendedCalories;
+  final List<double> recommendedDailyIntake;
   RadialProgress(
       {Key key,
       @required this.differentDate,
       @required this.calories,
       @required this.fats,
       @required this.proteins,
-      @required this.recommendedCalories})
+      @required this.recommendedDailyIntake})
       : super(key: key);
   @override
   _RadialProgressState createState() => _RadialProgressState();
@@ -40,19 +40,19 @@ class _RadialProgressState extends State<RadialProgress> {
     double displayedProteins =
         widget.differentDate ? widget.proteins[1] : widget.proteins[0];
 
-    progressColors[0] = displayedCalories < widget.recommendedCalories[1]
+    progressColors[0] = displayedFats < widget.recommendedDailyIntake[1]
         ? Colors.yellow[700]
         : Colors.red;
-    progressColors[1] = displayedCalories < widget.recommendedCalories[0]
+    progressColors[1] = displayedCalories < widget.recommendedDailyIntake[0]
         ? Colors.green[400]
         : Colors.red;
-    progressColors[2] = displayedCalories < widget.recommendedCalories[2]
+    progressColors[2] = displayedProteins < widget.recommendedDailyIntake[2]
         ? Colors.blue[600]
         : Colors.red;
 
     _percentage[0] = calculateCaloriePercentage(displayedCalories);
     _percentage[1] = calculateFatsPercentage(displayedFats);
-    _percentage[2] = calculateCaloriePercentage(displayedProteins);
+    _percentage[2] = calculateProteinPercentage(displayedProteins);
 
     _percentage.forEach((element) {
       if (element >= 1.0) {
@@ -75,7 +75,7 @@ class _RadialProgressState extends State<RadialProgress> {
                 child: Column(
                   children: [
                     new Text(
-                      displayedFats.toString() + 'g',
+                      displayedFats.toStringAsFixed(1) + 'g',
                       style: new TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 15.0),
                     ),
@@ -108,7 +108,7 @@ class _RadialProgressState extends State<RadialProgress> {
               child: Column(
                 children: [
                   new Text(
-                    displayedCalories.toString(),
+                    displayedCalories.toStringAsFixed(1),
                     style: new TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 25.0),
                   ),
@@ -142,7 +142,7 @@ class _RadialProgressState extends State<RadialProgress> {
                 child: Column(
                   children: [
                     new Text(
-                      displayedProteins.toString() + 'g',
+                      displayedProteins.toStringAsFixed(1) + 'g',
                       style: new TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 15.0),
                     ),
@@ -170,14 +170,14 @@ class _RadialProgressState extends State<RadialProgress> {
   }
 
   double calculateCaloriePercentage(double caloriesConsumed) {
-    return caloriesConsumed / (2 * widget.recommendedCalories[0]);
+    return caloriesConsumed / (2 * widget.recommendedDailyIntake[0]);
   }
 
   double calculateFatsPercentage(double fatsConsumed) {
-    return fatsConsumed / (2 * widget.recommendedCalories[1]);
+    return fatsConsumed / (2 * widget.recommendedDailyIntake[1]);
   }
 
   double calculateProteinPercentage(double proteinsConsumed) {
-    return proteinsConsumed / (2 * widget.recommendedCalories[2]);
+    return proteinsConsumed / (2 * widget.recommendedDailyIntake[2]);
   }
 }
