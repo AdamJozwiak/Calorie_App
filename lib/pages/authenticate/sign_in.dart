@@ -48,7 +48,7 @@ class _SignInState extends State<SignIn> {
                   child: Text(
                     'Log into call app',
                     style:
-                        TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold),
+                        TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                   ),
                 )),
                 Form(

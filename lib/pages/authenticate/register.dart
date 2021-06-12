@@ -49,7 +49,7 @@ class _RegisterState extends State<Register> {
                     child: Text(
                       'Register to call app',
                       style: TextStyle(
-                          fontSize: 35.0, fontWeight: FontWeight.bold),
+                          fontSize: 30.0, fontWeight: FontWeight.bold),
                     ),
                   )),
                   Form(
