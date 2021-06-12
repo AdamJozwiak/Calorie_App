@@ -1,6 +1,8 @@
-import 'package:call_app/shared/functions.dart';
+import 'package:call_app/widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+
+enum ModifiedNutrition { Calorie, Fat, Protein }
 
 class RadialProgress extends StatefulWidget {
   final bool differentDate;
@@ -8,13 +10,15 @@ class RadialProgress extends StatefulWidget {
   final List<double> fats;
   final List<double> proteins;
   final List<double> recommendedDailyIntake;
+  final changeRecommendedIntake;
   RadialProgress(
       {Key key,
       @required this.differentDate,
       @required this.calories,
       @required this.fats,
       @required this.proteins,
-      @required this.recommendedDailyIntake})
+      @required this.recommendedDailyIntake,
+      this.changeRecommendedIntake})
       : super(key: key);
   @override
   _RadialProgressState createState() => _RadialProgressState();
@@ -54,12 +58,6 @@ class _RadialProgressState extends State<RadialProgress> {
     _percentage[1] = calculateFatsPercentage(displayedFats);
     _percentage[2] = calculateProteinPercentage(displayedProteins);
 
-    _percentage.forEach((element) {
-      if (element >= 1.0) {
-        element = 1.0;
-      }
-    });
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -91,8 +89,10 @@ class _RadialProgressState extends State<RadialProgress> {
               progressColor: progressColors[0],
               startAngle: 270.0,
             ),
-            onTap: () {
-              showAlert(context, 'Change recommended fats', 'Tluszcze');
+            onTap: () async {
+              await changeRecIntake(context, 'Change recommended fats',
+                  'Fats (g)', ModifiedNutrition.Fat);
+              widget.changeRecommendedIntake(widget.recommendedDailyIntake);
             },
             highlightShape: BoxShape.circle,
             radius: 30.0,
@@ -124,8 +124,10 @@ class _RadialProgressState extends State<RadialProgress> {
             progressColor: progressColors[1],
             startAngle: 270.0,
           ),
-          onTap: () {
-            showAlert(context, 'Change recommended calories', 'Kalorie');
+          onTap: () async {
+            await changeRecIntake(context, 'Change recommended calories',
+                'Calories (kcal)', ModifiedNutrition.Calorie);
+            widget.changeRecommendedIntake(widget.recommendedDailyIntake);
           },
           highlightShape: BoxShape.circle,
           radius: 45.0,
@@ -158,8 +160,10 @@ class _RadialProgressState extends State<RadialProgress> {
               progressColor: progressColors[2],
               startAngle: 270.0,
             ),
-            onTap: () {
-              showAlert(context, 'Change recommended proteins', 'Proteiny');
+            onTap: () async {
+              await changeRecIntake(context, 'Change recommended proteins',
+                  'Proteins (g)', ModifiedNutrition.Protein);
+              widget.changeRecommendedIntake(widget.recommendedDailyIntake);
             },
             highlightShape: BoxShape.circle,
             radius: 30.0,
@@ -170,14 +174,59 @@ class _RadialProgressState extends State<RadialProgress> {
   }
 
   double calculateCaloriePercentage(double caloriesConsumed) {
-    return caloriesConsumed / (2 * widget.recommendedDailyIntake[0]);
+    double percentage =
+        caloriesConsumed / (2 * widget.recommendedDailyIntake[0]);
+    if (percentage >= 1.0) {
+      percentage = 1.0;
+    }
+    return percentage;
   }
 
   double calculateFatsPercentage(double fatsConsumed) {
-    return fatsConsumed / (2 * widget.recommendedDailyIntake[1]);
+    double percentage = fatsConsumed / (2 * widget.recommendedDailyIntake[1]);
+    if (percentage >= 1.0) {
+      percentage = 1.0;
+    }
+    return percentage;
   }
 
   double calculateProteinPercentage(double proteinsConsumed) {
-    return proteinsConsumed / (2 * widget.recommendedDailyIntake[2]);
+    double percentage =
+        proteinsConsumed / (2 * widget.recommendedDailyIntake[2]);
+    if (percentage >= 1.0) {
+      percentage = 1.0;
+    }
+    return percentage;
+  }
+
+  Future<double> changeRecIntake(BuildContext context, String title,
+      String contents, ModifiedNutrition nutrition) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        useSafeArea: true,
+        builder: (BuildContext context) {
+          return Alert(
+            alertType: AlertType.TextInputDialog,
+            title: title,
+            contents: contents,
+          );
+        }).then((value) {
+      if (value != 0.0 && value != null) {
+        if (nutrition == ModifiedNutrition.Calorie) {
+          setState(() {
+            widget.recommendedDailyIntake[0] = value;
+          });
+        } else if (nutrition == ModifiedNutrition.Fat) {
+          setState(() {
+            widget.recommendedDailyIntake[1] = value;
+          });
+        } else if (nutrition == ModifiedNutrition.Protein) {
+          setState(() {
+            widget.recommendedDailyIntake[2] = value;
+          });
+        }
+      }
+    });
   }
 }
