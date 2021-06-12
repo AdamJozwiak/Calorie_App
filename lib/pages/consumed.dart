@@ -1,8 +1,11 @@
 import 'package:call_app/models/food.dart';
 import 'package:call_app/models/user.dart';
 import 'package:call_app/services/database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+double _IMGSIZE = 70.0;
 
 class Consumed extends StatefulWidget {
   @override
@@ -48,53 +51,111 @@ class _ItemListState extends State<ItemList> {
   bool inititalBuild = true;
   List<Widget> list;
   List<Food> _modifiedData;
+  List<int> _wordLength;
+
   @override
   Widget build(BuildContext context) {
     if (inititalBuild) {
       list = new List<Widget>();
       _modifiedData = new List<Food>();
+      _wordLength = new List<int>();
+
+      list.add(tableHeader());
+
       widget.foodData.forEach((element) {
         _modifiedData.add(element);
+        _wordLength.add(element.name.length);
       });
       inititalBuild = false;
     }
     if (stateChanged) {
       list.clear();
       stateChanged = false;
+      list.add(tableHeader());
     }
 
     _modifiedData.forEach((element) {
       list.add(Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            imageCheck(element),
-            Text(element.amount.toString() + 'x'),
-            Text(element.name.toString().capitalize()),
-            Text((element.kcal * element.amount).toString()),
-            Text((element.fat * element.amount).toString()),
-            Text((element.protein * element.amount).toString()),
-            FlatButton.icon(
-              onPressed: () {
-                _modifiedData.remove(element);
-                modifyRecords(widget.user.uid, _modifiedData, widget.foodData)
-                    .then((value) {
-                  setState(() {
-                    stateChanged = value;
-                  });
-                });
-              },
-              icon: Icon(
-                Icons.delete_forever,
-                color: Colors.red[300],
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  imageCheck(element),
+                  Text(
+                    element.amount.toString() + 'x',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Expanded(
+                    child: Text(
+                      element.name.toString().capitalize(),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              label: Text(''),
-            )
+            ),
+            Expanded(
+              flex: 3,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    (element.kcal * element.amount).toStringAsFixed(1) +
+                        '\nkcal',
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text((element.fat * element.amount).toStringAsFixed(1) + 'g'),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text((element.protein * element.amount).toStringAsFixed(1) +
+                      'g'),
+                  FlatButton.icon(
+                    minWidth: 1.0,
+                    onPressed: () {
+                      _modifiedData.remove(element);
+                      modifyRecords(
+                              widget.user.uid, _modifiedData, widget.foodData)
+                          .then((value) {
+                        setState(() {
+                          stateChanged = value;
+                        });
+                      });
+                    },
+                    icon: Icon(
+                      Icons.delete_forever,
+                      color: Colors.red[300],
+                    ),
+                    label: Text(''),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ));
     });
+
+    // GridView.builder(
+    //     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+    //         maxCrossAxisExtent: 200,
+    //         childAspectRatio: 3 / 2,
+    //         crossAxisSpacing: 20,
+    //         mainAxisSpacing: 20),
+    //     itemCount: _modifiedData.length,
+    //     itemBuilder: (BuildContext context, index) {
+    //       Container(
+    //         alignment: Alignment.center,
+    //         child: ,)
+    //     });
 
     return ListView(shrinkWrap: true, children: [Column(children: list)]);
   }
@@ -122,8 +183,8 @@ Future<bool> modifyRecords(
 Widget imageCheck(Food data) {
   if (data.imageUrl != null && data.imageUrl != '') {
     return Container(
-      width: 100.0,
-      height: 100.0,
+      width: _IMGSIZE,
+      height: _IMGSIZE,
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           image: DecorationImage(
@@ -131,8 +192,8 @@ Widget imageCheck(Food data) {
     );
   } else {
     return Container(
-      width: 100.0,
-      height: 100.0,
+      width: _IMGSIZE,
+      height: _IMGSIZE,
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           image: DecorationImage(
@@ -140,4 +201,38 @@ Widget imageCheck(Food data) {
               image: AssetImage('assets/unavailableImage.png'))),
     );
   }
+}
+
+Widget tableHeader() {
+  return Column(children: [
+    Padding(
+      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 45.0,
+          ),
+          Text('Food'),
+          SizedBox(
+            width: 70.0,
+          ),
+          Text('Calories'),
+          SizedBox(
+            width: 13.0,
+          ),
+          Text('Fat(g)'),
+          SizedBox(
+            width: 10.0,
+          ),
+          Text('Protein(g)'),
+          SizedBox(
+            width: 15.0,
+          ),
+        ],
+      ),
+    ),
+    Divider(
+      thickness: 2.0,
+    )
+  ]);
 }
