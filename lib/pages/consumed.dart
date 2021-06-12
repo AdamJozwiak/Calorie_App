@@ -26,10 +26,10 @@ class _ConsumedState extends State<Consumed> {
           title: Text(
             'Food Consumed',
             style: TextStyle(
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 3.0,
-            ),
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 3.0,
+                color: Colors.black87),
           ),
           centerTitle: true,
         ),
