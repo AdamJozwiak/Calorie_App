@@ -15,8 +15,12 @@ class Wrapper extends StatelessWidget {
     if (user == null) {
       return Authenticate();
     } else {
-      return StreamProvider<List<Food>>.value(
-          value: DatabaseService(uid: user.uid).foods, child: Home());
+      return MultiProvider(providers: [
+        StreamProvider<List<Food>>.value(
+            value: DatabaseService(uid: user.uid).foods),
+        StreamProvider<List<double>>.value(
+            value: DatabaseService(uid: user.uid).intakes)
+      ], child: Home());
     }
   }
 }
