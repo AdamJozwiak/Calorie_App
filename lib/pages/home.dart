@@ -3,6 +3,7 @@ import 'package:call_app/models/user.dart';
 import 'package:call_app/services/auth.dart';
 import 'package:call_app/services/database.dart';
 import 'package:call_app/shared/functions.dart';
+import 'package:call_app/widgets/alert_dialog.dart';
 import 'package:call_app/widgets/radial_progress.dart';
 import 'package:call_app/widgets/text_search.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +22,11 @@ class _HomeState extends State<Home> {
   List<Food> _foodConsumed = List();
   List<Food> _displayedFood = List();
 
-  // Time 2, because there are different values for current and different days
+  // Times 2, because there are different values for current and different days
   List<double> _caloriesConsumed = List<double>(2);
   List<double> _fatsConsumed = List<double>(2);
   List<double> _proteinsConsumed = List<double>(2);
-  List<double> recommendedDailyIntake = List<double>(3);
+  List<double> _recommendedDailyIntake = List<double>(3);
 
   String _foodName;
   bool _isDifferentDayDisplayed = false;
@@ -35,9 +36,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _foodData = null;
-    recommendedDailyIntake[0] = 2500.0;
-    recommendedDailyIntake[1] = 50.0;
-    recommendedDailyIntake[2] = 55.0;
     super.initState();
   }
 
@@ -45,6 +43,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     currentUser = Provider.of<User>(context);
     _foodConsumed = Provider.of<List<Food>>(context) ?? [];
+    _recommendedDailyIntake =
+        Provider.of<List<double>>(context) ?? [2500.0, 50.0, 55.0];
     _caloriesConsumed[0] = countCalories(_foodConsumed) ?? 0.0;
     _fatsConsumed[0] = countFats(_foodConsumed) ?? 0.0;
     _proteinsConsumed[0] = countProteins(_foodConsumed) ?? 0.0;
@@ -112,19 +112,20 @@ class _HomeState extends State<Home> {
                         TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 15.0),
+                  SizedBox(height: 25.0),
                   RadialProgress(
                     differentDate: _isDifferentDayDisplayed,
                     calories: _caloriesConsumed,
                     fats: _fatsConsumed,
                     proteins: _proteinsConsumed,
-                    recommendedDailyIntake: recommendedDailyIntake,
+                    recommendedDailyIntake: _recommendedDailyIntake,
+                    changeRecommendedIntake: changeDailyIntake,
                   ),
-                  SizedBox(height: 40.0),
+                  SizedBox(height: 30.0),
                   TextSearch(callback: (foodName) => textApiInfo(foodName)),
                   SpeechRec(
                     getFoodname: getSpokenFood,
-                    buttonSize: 50.0,
+                    buttonSize: 60.0,
                   ),
                 ],
               ),
@@ -142,8 +143,8 @@ class _HomeState extends State<Home> {
       setState(() {
         _isDifferentDayDisplayed = true;
         _caloriesConsumed[1] = countCalories(_displayedFood);
-        _fatsConsumed[1] = countFats(_foodConsumed);
-        _proteinsConsumed[1] = countCalories(_displayedFood);
+        _fatsConsumed[1] = countFats(_displayedFood);
+        _proteinsConsumed[1] = countProteins(_displayedFood);
       });
     } else {
       setState(() {
@@ -170,12 +171,18 @@ class _HomeState extends State<Home> {
         });
         updateFoodList();
       } else {
-        showAlert(context, 'Wrong food name',
-            'I am sorry, but I did not understand. Could you reapeat?');
+        showAlert(
+            context,
+            'Wrong food name',
+            'I am sorry, but I did not understand. Could you reapeat?',
+            AlertType.InfoDialog);
       }
     } else {
-      showAlert(context, 'Wrong food name',
-          'You have not entered proper food name. Please, try again.');
+      showAlert(
+          context,
+          'Wrong food name',
+          'You have not entered proper food name. Please, try again.',
+          AlertType.InfoDialog);
     }
   }
 
@@ -190,12 +197,18 @@ class _HomeState extends State<Home> {
         });
         updateFoodList();
       } else {
-        showAlert(context, 'Wrong food name',
-            'I am sorry, but I did not understand. Could you reapeat?');
+        showAlert(
+            context,
+            'Wrong food name',
+            'I am sorry, but I did not understand. Could you reapeat?',
+            AlertType.InfoDialog);
       }
     } else {
-      showAlert(context, 'Wrong food name',
-          'You have not entered proper food name. Please, try again.');
+      showAlert(
+          context,
+          'Wrong food name',
+          'You have not entered proper food name. Please, try again.',
+          AlertType.InfoDialog);
     }
   }
 
@@ -220,5 +233,13 @@ class _HomeState extends State<Home> {
         _proteinsConsumed[0] = countProteins(_foodConsumed) ?? 0.0;
       });
     }
+  }
+
+  void changeDailyIntake(List<double> newIntake) async {
+    await DatabaseService(uid: currentUser.uid)
+        .updateRecommendedIntake(newIntake);
+    setState(() {
+      _recommendedDailyIntake = newIntake;
+    });
   }
 }
