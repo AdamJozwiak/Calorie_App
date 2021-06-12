@@ -49,7 +49,7 @@ class _TextSearchState extends State<TextSearch> with TickerProviderStateMixin {
                 focusNode: _textFocus,
                 controller: _textController,
                 decoration: InputDecoration(
-                  labelText: 'Input food name',
+                  hintText: 'Input food name',
                 ),
                 onChanged: (String foodName) {
                   _textFocus.requestFocus();
