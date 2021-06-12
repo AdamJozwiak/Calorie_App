@@ -1,3 +1,4 @@
+import 'package:call_app/widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:avatar_glow/avatar_glow.dart';
@@ -70,16 +71,19 @@ class _SpeechRecState extends State<SpeechRec> {
               if (!_isListening) {
                 listen();
               } else {
-                showAlert(
-                    context, 'Error', 'An error occured. Please try again');
+                showAlert(context, 'Error',
+                    'An error occured. Please try again', AlertType.InfoDialog);
               }
             },
             onPointerUp: (_) {
               if (_isListening) {
                 stopListening();
               } else {
-                showAlert(context, 'Cannot find result',
-                    'Please, try holding the button a little longer');
+                showAlert(
+                    context,
+                    'Cannot find result',
+                    'Please, try holding the button a little longer',
+                    AlertType.InfoDialog);
               }
             },
             child: Container(

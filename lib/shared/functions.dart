@@ -37,13 +37,17 @@ double countProteins(List<Food> foodConsumed) {
   return proteins;
 }
 
-Future<void> showAlert(
-    BuildContext context, String title, String contents) async {
+Future<void> showAlert(BuildContext context, String title, String contents,
+    AlertType alertType) async {
   return showDialog(
       context: context,
       barrierDismissible: false,
       useSafeArea: true,
       builder: (BuildContext context) {
-        return Alert(title, contents);
+        return Alert(
+          alertType: alertType,
+          title: title,
+          contents: contents,
+        );
       });
 }

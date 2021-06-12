@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:call_app/models/food.dart';
 import 'package:call_app/shared/appExceptions.dart';
 import 'package:call_app/shared/functions.dart';
+import 'package:call_app/widgets/alert_dialog.dart';
 import 'package:call_app/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -36,8 +37,11 @@ class _ApiState extends State<Api> {
         );
       } else {
         Navigator.pop(context);
-        showAlert(context, 'Wrong food name',
-            'I am sorry, but I did not understand. Could you reapeat?');
+        showAlert(
+            context,
+            'Wrong food name',
+            'I am sorry, but I did not understand. Could you reapeat?',
+            AlertType.InfoDialog);
       }
     } on SocketException {
       throw FetchDataException('No Internet connection');
