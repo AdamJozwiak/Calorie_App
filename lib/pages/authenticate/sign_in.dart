@@ -46,7 +46,7 @@ class _SignInState extends State<SignIn> {
                     child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 50.0),
                   child: Text(
-                    'Log into call app',
+                    'Log into cal app',
                     style:
                         TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                   ),

@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
                     height: 15.0,
                   ),
                   Text(
-                    'Calories Consumed',
+                    'Nutrients Consumed',
                     style:
                         TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,

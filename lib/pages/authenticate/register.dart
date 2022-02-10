@@ -47,7 +47,7 @@ class _RegisterState extends State<Register> {
                       child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 50.0),
                     child: Text(
-                      'Register to call app',
+                      'Register to cal app',
                       style: TextStyle(
                           fontSize: 30.0, fontWeight: FontWeight.bold),
                     ),
